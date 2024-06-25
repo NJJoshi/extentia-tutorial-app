@@ -54,9 +54,9 @@ annotate service.EmployeeSVC with @(
         },
         {
             $Type : 'UI.ReferenceFacet',
-            Label : 'Leave Info',
-            ID : 'LeaveInfo',
-            Target : '@UI.FieldGroup#LeaveInfo',
+            Label : 'Leaves Info Table',
+            ID : 'LeavesInfoTable',
+            Target : 'leaves/@UI.LineItem#LeavesInfoTable',
         },
     ],
     UI.LineItem : [
@@ -191,6 +191,73 @@ annotate service.EmployeeSVC with @(
                 $Type : 'UI.DataField',
                 Value : leaves.emp_id,
                 Label : 'Employee Id',
+            },],
+    }
+);
+annotate service.LeaveSVC with @(
+    UI.LineItem #LeavesInfoTable : [
+        {
+            $Type : 'UI.DataField',
+            Value : emp_id,
+            Label : 'Employee Name',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : date,
+            Label : 'Leave Date',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : days,
+            Label : 'No Of Days',
+        },]
+);
+annotate service.LeaveSVC with {
+    emp_id @(Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'EmployeeSVC',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : emp_id,
+                    ValueListProperty : 'ID',
+                },
+                {
+                    $Type : 'Common.ValueListParameterOut',
+                    ValueListProperty : 'name',
+                    LocalDataProperty : employee.name,
+                },
+            ],
+            Label : 'lbl_emp_id_leaves',
+        },
+        Common.ValueListWithFixedValues : true
+)};
+annotate service.EmployeeSVC with {
+    ID @Common.Text : {
+        $value : name,
+        ![@UI.TextArrangement] : #TextOnly,
+    }
+};
+annotate service.LeaveSVC with @(
+    UI.Facets : [
+        {
+            $Type : 'UI.ReferenceFacet',
+            Label : 'Leave Info',
+            ID : 'LeaveInfo',
+            Target : '@UI.FieldGroup#LeaveInfo',
+        },
+    ],
+    UI.FieldGroup #LeaveInfo : {
+        $Type : 'UI.FieldGroupType',
+        Data : [
+            {
+                $Type : 'UI.DataField',
+                Value : date,
+                Label : 'date',
+            },{
+                $Type : 'UI.DataField',
+                Value : days,
+                Label : 'days',
             },],
     }
 );

@@ -6,6 +6,7 @@ entity Employee
     emp_num : Integer;
     name : String(100);
     lwd : Date;
+    @mandatory
     salary : Integer;
     email_id : String(100);
     nok : Integer;
@@ -22,7 +23,9 @@ annotate Employee with @assert.unique :
 entity Leave
 {
     key leave_id : UUID;
+    @mandatory
     date : Date;
+    @mandatory
     days : Integer;
     emp_id : UUID;
     employee : Association to one Employee;
@@ -41,4 +44,9 @@ entity City
     key city_id : Integer;
     state_id : Integer;
     state : Association to one State on $self.state_id = state.state_id;
+}
+
+annotate Demands with {
+    @error.mandatory: 'Demands.plantCode.mandatory'
+    plantCode; //field name
 }
