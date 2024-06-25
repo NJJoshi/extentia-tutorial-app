@@ -5,27 +5,27 @@ annotate service.EmployeeSVC with @(
         Data : [
             {
                 $Type : 'UI.DataField',
-                Label : 'emp_num',
+                Label : 'Employee Number',
                 Value : emp_num,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'name',
+                Label : 'Employee Name',
                 Value : name,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'lwd',
+                Label : 'Last Working Day',
                 Value : lwd,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'salary',
+                Label : 'Salary',
                 Value : salary,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'email_id',
+                Label : 'Email Id',
                 Value : email_id,
             },
             {
@@ -35,12 +35,12 @@ annotate service.EmployeeSVC with @(
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'state_state_id',
+                Label : 'State',
                 Value : state_state_id,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'city_city_id',
+                Label : 'City',
                 Value : city_city_id,
             },
         ],
@@ -52,42 +52,48 @@ annotate service.EmployeeSVC with @(
             Label : 'General Information',
             Target : '@UI.FieldGroup#GeneratedGroup',
         },
+        {
+            $Type : 'UI.ReferenceFacet',
+            Label : 'Leave Info',
+            ID : 'LeaveInfo',
+            Target : '@UI.FieldGroup#LeaveInfo',
+        },
     ],
     UI.LineItem : [
         {
             $Type : 'UI.DataField',
-            Label : 'emp_num',
+            Label : 'Employee Number',
             Value : emp_num,
         },
         {
             $Type : 'UI.DataField',
-            Label : 'name',
+            Label : 'Employee Name',
             Value : name,
         },
         {
             $Type : 'UI.DataField',
-            Label : 'lwd',
+            Label : 'Last Working Day',
             Value : lwd,
         },
         {
             $Type : 'UI.DataField',
-            Label : 'salary',
+            Label : 'Salary',
             Value : salary,
         },
         {
             $Type : 'UI.DataField',
-            Label : 'email_id',
+            Label : 'Email Id',
             Value : email_id,
         },
         {
             $Type : 'UI.DataField',
             Value : state_state_id,
-            Label : 'state_state_id',
+            Label : 'State',
         },
         {
             $Type : 'UI.DataField',
             Value : city_city_id,
-            Label : 'city_city_id',
+            Label : 'City',
         },
     ],
 );
@@ -169,3 +175,22 @@ annotate service.CitySVC with {
 annotate service.EmployeeSVC with {
     state @Common.ValueListWithFixedValues : true
 };
+annotate service.EmployeeSVC with @(
+    UI.FieldGroup #LeaveInfo : {
+        $Type : 'UI.FieldGroupType',
+        Data : [
+            {
+                $Type : 'UI.DataField',
+                Value : leaves.date,
+                Label : 'Date',
+            },{
+                $Type : 'UI.DataField',
+                Value : leaves.days,
+                Label : 'Days',
+            },{
+                $Type : 'UI.DataField',
+                Value : leaves.emp_id,
+                Label : 'Employee Id',
+            },],
+    }
+);

@@ -50,7 +50,8 @@
         "sap.m": {},
         "sap.ui.core": {},
         "sap.ushell": {},
-        "sap.fe.templates": {}
+        "sap.fe.templates": {},
+        "sap.f": {}
       }
     },
     "contentDensities": {
@@ -82,22 +83,37 @@
       "css": []
     },
     "routing": {
-      "config": {},
+      "config": {
+        "flexibleColumnLayout": {
+          "defaultTwoColumnLayoutType": "TwoColumnsMidExpanded",
+          "defaultThreeColumnLayoutType": "ThreeColumnsMidExpanded"
+        },
+        "routerClass": "sap.f.routing.Router"
+      },
       "routes": [
         {
           "pattern": ":?query:",
           "name": "EmployeeSVCList",
-          "target": "EmployeeSVCList"
+          "target": [
+            "EmployeeSVCList"
+          ]
         },
         {
           "pattern": "EmployeeSVC({key}):?query:",
           "name": "EmployeeSVCObjectPage",
-          "target": "EmployeeSVCObjectPage"
+          "target": [
+            "EmployeeSVCList",
+            "EmployeeSVCObjectPage"
+          ]
         },
         {
           "pattern": "EmployeeSVC({key})/leaves({key2}):?query:",
           "name": "LeaveSVCObjectPage",
-          "target": "LeaveSVCObjectPage"
+          "target": [
+            "EmployeeSVCList",
+            "EmployeeSVCObjectPage",
+            "LeaveSVCObjectPage"
+          ]
         }
       ],
       "targets": {
@@ -122,9 +138,12 @@
                     "type": "ResponsiveTable"
                   }
                 }
-              }
+              },
+              "initialLoad": "Enabled"
             }
-          }
+          },
+          "controlAggregation": "beginColumnPages",
+          "contextPattern": ""
         },
         "EmployeeSVCObjectPage": {
           "type": "Component",
@@ -142,7 +161,9 @@
                 }
               }
             }
-          }
+          },
+          "controlAggregation": "midColumnPages",
+          "contextPattern": "/EmployeeSVC({key})"
         },
         "LeaveSVCObjectPage": {
           "type": "Component",
@@ -153,9 +174,17 @@
               "editableHeaderContent": false,
               "contextPath": "/EmployeeSVC/leaves"
             }
-          }
+          },
+          "controlAggregation": "endColumnPages",
+          "contextPattern": "/EmployeeSVC({key})/leaves({key2})"
         }
       }
+    },
+    "rootView": {
+      "viewName": "sap.fe.templates.RootContainer.view.Fcl",
+      "type": "XML",
+      "async": true,
+      "id": "appRootView"
     }
   },
   "sap.fiori": {
