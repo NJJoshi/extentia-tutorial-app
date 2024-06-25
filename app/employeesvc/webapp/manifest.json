@@ -1,7 +1,7 @@
 {
   "_version": "1.59.0",
   "sap.app": {
-    "id": "sap.capire.employees.employeeservice",
+    "id": "sap.capire.employees.employeesvc",
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
@@ -13,7 +13,7 @@
     "sourceTemplate": {
       "id": "@sap/generator-fiori:lrop",
       "version": "1.14.0",
-      "toolsId": "5c991afd-d89b-418d-8fbb-4cbdab2812cc"
+      "toolsId": "83242a0a-a4c9-459c-845d-9dd00c2feb0a"
     },
     "dataSources": {
       "mainService": {
@@ -50,8 +50,7 @@
         "sap.m": {},
         "sap.ui.core": {},
         "sap.ushell": {},
-        "sap.fe.templates": {},
-        "sap.f": {}
+        "sap.fe.templates": {}
       }
     },
     "contentDensities": {
@@ -62,7 +61,7 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "sap.capire.employees.employeeservice.i18n.i18n"
+          "bundleName": "sap.capire.employees.employeesvc.i18n.i18n"
         }
       },
       "": {
@@ -83,43 +82,37 @@
       "css": []
     },
     "routing": {
-      "config": {
-        "flexibleColumnLayout": {
-          "defaultTwoColumnLayoutType": "TwoColumnsMidExpanded",
-          "defaultThreeColumnLayoutType": "ThreeColumnsEndExpanded"
-        },
-        "routerClass": "sap.f.routing.Router"
-      },
+      "config": {},
       "routes": [
         {
           "pattern": ":?query:",
-          "name": "EmployeeList",
-          "target": [
-            "EmployeeList"
-          ]
+          "name": "EmployeeSVCList",
+          "target": "EmployeeSVCList"
         },
         {
-          "pattern": "Employee({key}):?query:",
-          "name": "EmployeeObjectPage",
-          "target": [
-            "EmployeeList",
-            "EmployeeObjectPage"
-          ]
+          "pattern": "EmployeeSVC({key}):?query:",
+          "name": "EmployeeSVCObjectPage",
+          "target": "EmployeeSVCObjectPage"
+        },
+        {
+          "pattern": "EmployeeSVC({key})/leaves({key2}):?query:",
+          "name": "LeaveSVCObjectPage",
+          "target": "LeaveSVCObjectPage"
         }
       ],
       "targets": {
-        "EmployeeList": {
+        "EmployeeSVCList": {
           "type": "Component",
-          "id": "EmployeeList",
+          "id": "EmployeeSVCList",
           "name": "sap.fe.templates.ListReport",
           "options": {
             "settings": {
-              "contextPath": "/Employee",
+              "contextPath": "/EmployeeSVC",
               "variantManagement": "Page",
               "navigation": {
-                "Employee": {
+                "EmployeeSVC": {
                   "detail": {
-                    "route": "EmployeeObjectPage"
+                    "route": "EmployeeSVCObjectPage"
                   }
                 }
               },
@@ -131,30 +124,38 @@
                 }
               }
             }
-          },
-          "controlAggregation": "beginColumnPages",
-          "contextPattern": ""
+          }
         },
-        "EmployeeObjectPage": {
+        "EmployeeSVCObjectPage": {
           "type": "Component",
-          "id": "EmployeeObjectPage",
+          "id": "EmployeeSVCObjectPage",
           "name": "sap.fe.templates.ObjectPage",
           "options": {
             "settings": {
               "editableHeaderContent": false,
-              "contextPath": "/Employee"
+              "contextPath": "/EmployeeSVC",
+              "navigation": {
+                "leaves": {
+                  "detail": {
+                    "route": "LeaveSVCObjectPage"
+                  }
+                }
+              }
             }
-          },
-          "controlAggregation": "midColumnPages",
-          "contextPattern": "/Employee({key})"
+          }
+        },
+        "LeaveSVCObjectPage": {
+          "type": "Component",
+          "id": "LeaveSVCObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "editableHeaderContent": false,
+              "contextPath": "/EmployeeSVC/leaves"
+            }
+          }
         }
       }
-    },
-    "rootView": {
-      "viewName": "sap.fe.templates.RootContainer.view.Fcl",
-      "type": "XML",
-      "async": true,
-      "id": "appRootView"
     }
   },
   "sap.fiori": {

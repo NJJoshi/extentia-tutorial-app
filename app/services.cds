@@ -1,2 +1,2 @@
 
-using from './employeeservice/annotations';
+using from './employeesvc/annotations';

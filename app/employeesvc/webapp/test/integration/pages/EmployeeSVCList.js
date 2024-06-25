@@ -8,9 +8,9 @@ sap.ui.define(['sap/fe/test/ListReport'], function(ListReport) {
 
     return new ListReport(
         {
-            appId: 'sap.capire.employees.employeeservice',
-            componentId: 'EmployeeList',
-            contextPath: '/Employee'
+            appId: 'sap.capire.employees.employeesvc',
+            componentId: 'EmployeeSVCList',
+            contextPath: '/EmployeeSVC'
         },
         CustomPageDefinitions
     );

@@ -8,9 +8,9 @@ sap.ui.define(['sap/fe/test/ObjectPage'], function(ObjectPage) {
 
     return new ObjectPage(
         {
-            appId: 'sap.capire.employees.employeeservice',
-            componentId: 'EmployeeObjectPage',
-            contextPath: '/Employee'
+            appId: 'sap.capire.employees.employeesvc',
+            componentId: 'EmployeeSVCObjectPage',
+            contextPath: '/EmployeeSVC'
         },
         CustomPageDefinitions
     );

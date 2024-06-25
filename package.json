@@ -11,7 +11,10 @@
     "app/employeeservice",
     "app/employeeservice",
     "app/employeeservice",
-    "app/employeeservice"
+    "app/employeeservice",
+    "app/employee",
+    "app/employeesvc",
+    "app/employeesvc"
   ],
   "devDependencies": {
     "@sap/ux-specification": "^1.120.13"

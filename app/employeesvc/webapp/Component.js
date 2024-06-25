@@ -3,7 +3,7 @@ sap.ui.define(
     function (Component) {
         "use strict";
 
-        return Component.extend("sap.capire.employees.employeeservice.Component", {
+        return Component.extend("sap.capire.employees.employeesvc.Component", {
             metadata: {
                 manifest: "json"
             }

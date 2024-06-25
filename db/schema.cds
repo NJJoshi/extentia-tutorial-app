@@ -1,50 +1,43 @@
 namespace sap.capire.employees;
 
-using
-{
-    managed,
-    cuid
+ 
+@assert.unique : {
+   emp_num: [ emp_num ]
 }
-from '@sap/cds/common';
-
-entity Employee : cuid, managed
+entity Employee
 {
-    Number : Integer;
-    Name : String(111);
-    LWD : Date;
-    Salary : Decimal(9,2);
-    email_Id : String;
-    NOK_Phone : String
-        @assert.format : '[0-9]+';
-    leaves : Association to one Leave;
-    City : String(100);
-    State : String(100);
-    city_id : Association to one City on city_id.ID = ID;
-    state_id : Association to one State on state_id.ID = ID;
+    key ID : UUID;
+    emp_num : Integer;
+    name : String(100);
+    lwd : Date;
+    salary : Integer;
+    email_id : String(100);
+    nok : Integer;
+    state : Association to one State;
+    city : Association to one City;
+    leaves : Composition of many Leave on leaves.employee = $self;
 }
-
-entity Leave : managed
+ 
+entity Leave
 {
-    Leave_ID : UUID;
-    employee : Association to many Employee on employee.leaves = $self;
-    Leave_Date : Date
-        @mandatory;
-    No_Of_Days : Integer
-        @manadatory;
+    key leave_id : UUID;
+    date : Date;
+    days : Integer;
+    emp_id : UUID;
+    employee : Association to one Employee;
 }
-
-/**
- * name
- */
+ 
 entity State
 {
-    key ID : UUID;
-    name : String(100);
+    name : String;
+    key state_id : Integer;
+    cities : Association to many City on cities.state_id = $self.state_id;
 }
-
+ 
 entity City
 {
-    key ID : UUID;
-    name : String(100);
-    state_id : Association to one State;
+    name : String;
+    key city_id : Integer;
+    state_id : Integer;
+    state : Association to one State on $self.state_id = state.state_id;
 }
