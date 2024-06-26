@@ -2,12 +2,14 @@ namespace sap.capire.employees;
 
 entity Employee
 {
-    key ID : UUID;
+    key ID : UUID
+        @Core.Computed;
     emp_num : Integer;
     name : String(100);
     lwd : Date;
-    @mandatory
-    salary : Integer;
+    salary : Integer
+        @mandatory
+        @validation_error_message.message : 'Please provide salary.';
     email_id : String(100);
     nok : Integer;
     state : Association to one State;
@@ -23,10 +25,10 @@ annotate Employee with @assert.unique :
 entity Leave
 {
     key leave_id : UUID;
-    @mandatory
-    date : Date;
-    @mandatory
-    days : Integer;
+    date : Date
+        @mandatory;
+    days : Integer
+        @mandatory;
     emp_id : UUID;
     employee : Association to one Employee;
 }
@@ -36,6 +38,7 @@ entity State
     name : String;
     key state_id : Integer;
     cities : Association to many City on cities.state_id = $self.state_id;
+    emp_count : Integer not null default 0;
 }
 
 entity City
@@ -44,9 +47,4 @@ entity City
     key city_id : Integer;
     state_id : Integer;
     state : Association to one State on $self.state_id = state.state_id;
-}
-
-annotate Demands with {
-    @error.mandatory: 'Demands.plantCode.mandatory'
-    plantCode; //field name
 }

@@ -261,3 +261,6 @@ annotate service.LeaveSVC with @(
             },],
     }
 );
+annotate service.EmployeeSVC with {
+    emp_num @Common.FieldControl : #ReadOnly
+};
