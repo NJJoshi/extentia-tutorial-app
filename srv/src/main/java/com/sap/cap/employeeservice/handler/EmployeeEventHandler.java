@@ -9,15 +9,19 @@ import com.sap.cds.Result;
 import com.sap.cds.ql.CQL;
 import com.sap.cds.ql.Select;
 import com.sap.cds.ql.Update;
+import com.sap.cds.ql.cqn.CqnAnalyzer;
 import com.sap.cds.ql.cqn.CqnElementRef;
 import com.sap.cds.ql.cqn.CqnSelect;
 import com.sap.cds.ql.cqn.CqnUpdate;
+import com.sap.cds.reflect.CdsModel;
 import com.sap.cds.services.ErrorStatuses;
 import com.sap.cds.services.ServiceException;
+import com.sap.cds.services.cds.CdsDeleteEventContext;
 import com.sap.cds.services.cds.CqnService;
 import com.sap.cds.services.handler.EventHandler;
 import com.sap.cds.services.handler.annotations.After;
 import com.sap.cds.services.handler.annotations.Before;
+import com.sap.cds.services.handler.annotations.On;
 import com.sap.cds.services.handler.annotations.ServiceName;
 import com.sap.cds.services.persistence.PersistenceService;
 
@@ -25,6 +29,7 @@ import cds.gen.employeeservice.EmployeeSVC_;
 import cds.gen.employeeservice.EmployeeService_;
 import cds.gen.employeeservice.StateSVC_;
 import cds.gen.sap.capire.employees.Employee;
+import cds.gen.sap.capire.employees.Employee_;
 import cds.gen.sap.capire.employees.State;
 
 @Component
@@ -61,6 +66,23 @@ public class EmployeeEventHandler implements EventHandler {
     public void afterUpdateEmployeeCountInState(Employee emp){
         System.out.println("#### After Received new Emp State update:" + emp);
         updateNewStateEmpCount(emp);
+    }  
+    
+    @Before(event = {CqnService.EVENT_DELETE}, entity=EmployeeSVC_.CDS_NAME)
+    public void onDeleteUpdateEmployeeCountInState(CdsDeleteEventContext context){
+        System.out.println("#### On Delete Received new Emp State update #####");
+        CdsModel cdsModel = context.getModel();
+        CqnAnalyzer cqnAnalyzer = CqnAnalyzer.create(cdsModel);
+        String employeeId = (String) cqnAnalyzer.analyze(context.getCqn()).targetKeys().get(Employee.ID);
+        CqnSelect employeeQuery = Select.from(EmployeeSVC_.class).where(e -> e.get("ID").eq(employeeId));
+        Optional<Employee> empOptional= db.run(employeeQuery).first(Employee.class);
+        if(empOptional.isPresent())
+        {
+            Employee oldEmp=empOptional.get();
+            Integer stateId=oldEmp.getStateStateId();
+            System.out.println("#### On Delete Received new Emp State update:" + oldEmp);
+            handleExistingEmpStateEmpCount(oldEmp, stateId);
+        }
     }    
 
     private void updateNewStateEmpCount(Employee emp) {
@@ -88,23 +110,34 @@ public class EmployeeEventHandler implements EventHandler {
     private int returnAndValidateExistingStateEmpCount(Employee emp) {
         System.out.println("#### Inside validateStateEmpUpdateCount ####");
         //Get existing emp object
-        CqnSelect fetchExistingEmp = Select.from(EmployeeSVC_.class).columns(e -> e.state_state_id()).where(e -> e.ID().eq(emp.getId()));
+        CqnSelect fetchExistingEmp = Select.from(EmployeeSVC_.class)
+                                           .columns(e -> e.state_state_id())
+                                           .where(e -> e.ID().eq(emp.getId()));
         Optional<Employee> existingEmp = db.run(fetchExistingEmp)
-                                 .first(Employee.class);
+                                            .first(Employee.class);
         System.out.println("Existing emp: " + existingEmp);
+        System.out.println("New emp: " + emp);
         //validation before update
-        if(existingEmp.isPresent() && existingEmp.get().getStateStateId().equals(emp.getStateStateId())) {                        
+        if(existingEmp.isPresent() && (emp.getStateStateId() != null) && (existingEmp.get().getStateStateId() != null) && existingEmp.get().getStateStateId().equals(emp.getStateStateId())) {                        
             System.out.println("Found Same State Id: "+ existingEmp.get().getStateStateId() +" for update. Skipping Update.");
             return 0;
         } 
         System.out.println("#### Ends validateStateEmpUpdateCount ####");
-        return existingEmp.isPresent() ? existingEmp.get().getStateStateId() : -1 ;
+        return (existingEmp.isPresent() && existingEmp.get().getStateStateId() != null) ? existingEmp.get().getStateStateId() : -1 ;
     }
 
     private void updateExistingStateEmployeeCount(Employee emp) {
+        System.out.println("#### Inside updateExistingStateEmployeeCount ####");
         int exisistingStateId = returnAndValidateExistingStateEmpCount(emp);
         if(exisistingStateId > 0) {
-            System.out.println("#### Inside validateAndUpdateExistingStateEmployeeCount ####");
+            handleExistingEmpStateEmpCount(emp, exisistingStateId);
+        } else {
+            System.out.println("##### No existing State Data #####");
+        }
+    }
+
+    private void handleExistingEmpStateEmpCount(Employee emp, int exisistingStateId) {
+        System.out.println("#### Inside handleExistingEmpStateEmpCount ####");
             //Update existing State Emp Count
             CqnSelect fetchExistingStateEmpCount = Select.from(StateSVC_.class).columns(s -> s.emp_count()).where(s -> s.state_id().eq(exisistingStateId));
             State existingStateEmpCount = db.run(fetchExistingStateEmpCount)
@@ -115,8 +148,5 @@ public class EmployeeEventHandler implements EventHandler {
             CqnUpdate existingStateEmpCountUpdate = Update.entity(StateSVC_.class).data(existingStateEmpCount).where(s -> s.state_id().eq(exisistingStateId));
             db.run(existingStateEmpCountUpdate);
             System.out.println("##### Updated existing State Data #####");
-        } else {
-            System.out.println("##### No existing State Data #####");
-        }
     }
 }
