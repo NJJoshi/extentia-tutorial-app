@@ -62,13 +62,16 @@ public class EmployeeEventHandler implements EventHandler {
     public void updateEmployeeCountInState(Employee emp){
         if(null != emp) {
             System.out.println("#### Before Received new Emp State update:" + emp);
+            validateSalary(emp);
             updateExistingStateEmployeeCount(emp);
         }
     }
 
-    @After(event = {CqnService.EVENT_CREATE, CqnService.EVENT_UPDATE}, entity=EmployeeSVC_.CDS_NAME)
+
+ @After(event = {CqnService.EVENT_CREATE, CqnService.EVENT_UPDATE}, entity=EmployeeSVC_.CDS_NAME)
     public void afterUpdateEmployeeCountInState(Employee emp){
         System.out.println("#### After Received new Emp State update:" + emp);
+        validateSalary(emp);
         updateNewStateEmpCount(emp);
     }  
     
@@ -89,6 +92,12 @@ public class EmployeeEventHandler implements EventHandler {
         }
     }    
 
+    //Validate Salary. If Salary is more than 10,000 then raise Exception with message
+    private void validateSalary(Employee emp) {
+        if(emp.getSalary() > 10000) {
+            throw new ServiceException(ErrorStatuses.BAD_REQUEST, "Salary is higher than decided limit.") ;
+        }
+    }
     private void updateNewStateEmpCount(Employee emp) {
         System.out.println("#### Inside updateNewStateEmpCount ####");
         //Fetch data from employees to get employee count by state id
