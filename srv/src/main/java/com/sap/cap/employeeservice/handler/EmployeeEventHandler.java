@@ -1,5 +1,7 @@
 package com.sap.cap.employeeservice.handler;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import com.sap.cds.ql.cqn.CqnUpdate;
 import com.sap.cds.reflect.CdsModel;
 import com.sap.cds.services.ErrorStatuses;
 import com.sap.cds.services.ServiceException;
+import com.sap.cds.services.authorization.CalcWhereConditionEventContext;
 import com.sap.cds.services.cds.CdsDeleteEventContext;
 import com.sap.cds.services.cds.CqnService;
 import com.sap.cds.services.handler.EventHandler;
@@ -25,11 +28,11 @@ import com.sap.cds.services.handler.annotations.On;
 import com.sap.cds.services.handler.annotations.ServiceName;
 import com.sap.cds.services.persistence.PersistenceService;
 
+import cds.gen.employeeservice.CalculateEmpStateWiseContext;
 import cds.gen.employeeservice.EmployeeSVC_;
 import cds.gen.employeeservice.EmployeeService_;
 import cds.gen.employeeservice.StateSVC_;
 import cds.gen.sap.capire.employees.Employee;
-import cds.gen.sap.capire.employees.Employee_;
 import cds.gen.sap.capire.employees.State;
 
 @Component
@@ -58,14 +61,14 @@ public class EmployeeEventHandler implements EventHandler {
     public void updateEmployeeCountInState(Employee emp){
         if(null != emp) {
             System.out.println("#### Before Received new Emp State update:" + emp);
-            updateExistingStateEmployeeCount(emp);
+            //updateExistingStateEmployeeCount(emp);
         }
     }
 
     @After(event = {CqnService.EVENT_CREATE, CqnService.EVENT_UPDATE}, entity=EmployeeSVC_.CDS_NAME)
     public void afterUpdateEmployeeCountInState(Employee emp){
         System.out.println("#### After Received new Emp State update:" + emp);
-        updateNewStateEmpCount(emp);
+        //updateNewStateEmpCount(emp);
     }  
     
     @Before(event = {CqnService.EVENT_DELETE}, entity=EmployeeSVC_.CDS_NAME)
@@ -148,5 +151,56 @@ public class EmployeeEventHandler implements EventHandler {
             CqnUpdate existingStateEmpCountUpdate = Update.entity(StateSVC_.class).data(existingStateEmpCount).where(s -> s.state_id().eq(exisistingStateId));
             db.run(existingStateEmpCountUpdate);
             System.out.println("##### Updated existing State Data #####");
+    }
+
+    @On(event = CalculateEmpStateWiseContext.CDS_NAME)
+    public void customActionRecalculateEmpCountByState(CalculateEmpStateWiseContext context) {
+        System.out.println("#### Inside customActionRecalculateEmpCountByState ####");
+        Map<Integer, Integer> employeeCountByStateIdMap = collectStatewiseEmployeeCount();
+        updateEntireStateEntity(employeeCountByStateIdMap);
+        context.setCompleted();
+        System.out.println("#### Ends customActionRecalculateEmpCountByState ####");
+    }
+
+    private void updateEntireStateEntity(Map<Integer, Integer> employeeCountByStateIdMap) {
+        //Get All State Rows order by State Id
+        CqnSelect getAllStates = Select.from(StateSVC_.class)
+                                       .columns(c ->c.get("state_id"), c-> c.get("name"))
+                                       .orderBy("state_id");
+        db.run(getAllStates).forEach(stateRow ->{
+            Integer state_id = Integer.parseInt(stateRow.get("state_id").toString());
+            String state_name = stateRow.get("name").toString();
+            Integer empCount = -1;
+            System.out.println("Updating for State Id:" + state_id+", state_name:"+state_name);
+            // Retrieve statewise employee count and update State Entity
+            if((empCount = employeeCountByStateIdMap.get(state_id)) != null) {
+                State state = State.create();                    
+                state.setEmpCount(empCount);
+                CqnUpdate update = Update.entity(StateSVC_.class).data(state).where(s -> s.state_id().eq(state_id.intValue()));
+                db.run(update);
+                System.out.println("Update complete for State Id:" + state_id+", state_name:"+state_name);
+            }
+        });
+    }
+
+    private Map<Integer, Integer> collectStatewiseEmployeeCount() {
+        Map<Integer, Integer> employeeCountByStateIdMap = new HashMap<>();
+
+        //Fetch data from employees to get employee count by state id
+        CqnSelect getEmpCountByStateId = Select.from(EmployeeSVC_.class)
+                                                .columns(c -> c.get("state_state_id"), 
+                                                         c-> CQL.count(c.get("emp_num")).as("empCount")
+                                                         )
+                                                .groupBy(g -> g.get("state_state_id"));
+        db.run(getEmpCountByStateId).forEach(row -> {
+            Integer state_id = Integer.parseInt((null != row.get("state_state_id")) ? row.get("state_state_id").toString() : "0");
+            Integer empCount = Integer.parseInt(row.get("empCount").toString());
+            if(state_id > 0 &&  empCount > 0) {                
+                //Collect State wise employee count 
+                employeeCountByStateIdMap.put(state_id, empCount);
+            }
+        });
+        System.out.println("#### Total collected data into collection for statewise emp count:" + employeeCountByStateIdMap.size());
+        return employeeCountByStateIdMap;
     }
 }

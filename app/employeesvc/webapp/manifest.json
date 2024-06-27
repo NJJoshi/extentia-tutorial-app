@@ -137,6 +137,14 @@
                 "@com.sap.vocabularies.UI.v1.LineItem": {
                   "tableSettings": {
                     "type": "ResponsiveTable"
+                  },
+                  "actions": {
+                    "DataFieldForAction::EmployeeService.calculateEmpStateWise": {
+                      "afterExecution": {
+                        "enableAutoScroll": true
+                      },
+                      "enableOnSelect": "multi"
+                    }
                   }
                 }
               },

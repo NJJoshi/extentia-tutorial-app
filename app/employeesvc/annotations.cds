@@ -95,6 +95,11 @@ annotate service.EmployeeSVC with @(
             Value : city_city_id,
             Label : 'City',
         },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'EmployeeService.calculateEmpStateWise',
+            Label : 'Recalc Employee Count in one State',
+        },
     ],
 );
 
@@ -264,3 +269,12 @@ annotate service.LeaveSVC with @(
 annotate service.EmployeeSVC with {
     emp_num @Common.FieldControl : #ReadOnly
 };
+annotate service.EmployeeSVC with @(
+    UI.Identification : [
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'EmployeeService.calculateEmpStateWise',
+            Label : 'Recalc Employee Count in one State',
+        },
+    ]
+);

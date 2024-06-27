@@ -5,8 +5,10 @@ service EmployeeService {
     //For create button enable
     @odata.draft.enabled
     entity EmployeeSVC as
-        projection on db.Employee;
- 
+        projection on db.Employee
+    actions {
+        action calculateEmpStateWise();
+    };
    @fiori.draft.enabled
     entity LeaveSVC as
         projection on db.Leave;
