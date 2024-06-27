@@ -100,6 +100,12 @@ annotate service.EmployeeSVC with @(
             Action : 'EmployeeService.calculateEmpStateWise',
             Label : 'Recalc Employee Count in one State',
         },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'EmployeeService.zeroStateCount',
+            Label : 'Zero State Count',
+            Inline : true,
+        },
     ],
 );
 

@@ -8,6 +8,7 @@ service EmployeeService {
         projection on db.Employee
     actions {
         action calculateEmpStateWise();
+        action zeroStateCount();
     };
    @fiori.draft.enabled
     entity LeaveSVC as

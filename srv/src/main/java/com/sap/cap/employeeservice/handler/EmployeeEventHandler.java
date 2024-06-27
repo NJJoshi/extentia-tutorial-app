@@ -32,6 +32,7 @@ import cds.gen.employeeservice.CalculateEmpStateWiseContext;
 import cds.gen.employeeservice.EmployeeSVC_;
 import cds.gen.employeeservice.EmployeeService_;
 import cds.gen.employeeservice.StateSVC_;
+import cds.gen.employeeservice.ZeroStateCountContext;
 import cds.gen.sap.capire.employees.Employee;
 import cds.gen.sap.capire.employees.State;
 
@@ -61,14 +62,14 @@ public class EmployeeEventHandler implements EventHandler {
     public void updateEmployeeCountInState(Employee emp){
         if(null != emp) {
             System.out.println("#### Before Received new Emp State update:" + emp);
-            //updateExistingStateEmployeeCount(emp);
+            updateExistingStateEmployeeCount(emp);
         }
     }
 
     @After(event = {CqnService.EVENT_CREATE, CqnService.EVENT_UPDATE}, entity=EmployeeSVC_.CDS_NAME)
     public void afterUpdateEmployeeCountInState(Employee emp){
         System.out.println("#### After Received new Emp State update:" + emp);
-        //updateNewStateEmpCount(emp);
+        updateNewStateEmpCount(emp);
     }  
     
     @Before(event = {CqnService.EVENT_DELETE}, entity=EmployeeSVC_.CDS_NAME)
@@ -151,6 +152,37 @@ public class EmployeeEventHandler implements EventHandler {
             CqnUpdate existingStateEmpCountUpdate = Update.entity(StateSVC_.class).data(existingStateEmpCount).where(s -> s.state_id().eq(exisistingStateId));
             db.run(existingStateEmpCountUpdate);
             System.out.println("##### Updated existing State Data #####");
+    }
+
+    @On(event = ZeroStateCountContext.CDS_NAME)    
+    public void customActionUpdateZeroEmpCountforState(ZeroStateCountContext context) {
+        System.out.println("#### Inside customActionUpdateZeroEmpCountforState ####");
+        System.out.println("Event occurred for Emp Id:" + context.getEvent());
+        CdsModel cdsModel = context.getModel();
+        CqnAnalyzer cqnAnalyzer = CqnAnalyzer.create(cdsModel);
+        String employeeId = (String) cqnAnalyzer.analyze(context.getCqn()).targetKeys().get(Employee.ID);
+        CqnSelect employeeQuery = Select.from(EmployeeSVC_.class).where(e -> e.get("ID").eq(employeeId));
+        Optional<Employee> empOptional= db.run(employeeQuery).first(Employee.class);
+        if(empOptional.isPresent())
+        {
+            Employee oldEmp=empOptional.get();
+            Integer stateId=oldEmp.getStateStateId();
+            System.out.println("#### On ZeroStateCountContext Received new Emp State update:" + oldEmp);
+            oldEmp.setCity(null);
+            oldEmp.setCityCityId(0);
+            oldEmp.setState(null);
+            oldEmp.setStateStateId(0);
+            CqnUpdate existingEmpUpdt = Update.entity(EmployeeSVC_.class).data(oldEmp).where(e -> e.ID().eq(employeeId));
+            db.run(existingEmpUpdt);
+            System.out.println("#### Updated Employee Entity ####");
+            State state = State.create();                    
+            state.setEmpCount(0);
+            CqnUpdate existingStateEmpCountUpdate = Update.entity(StateSVC_.class).data(state).where(s -> s.state_id().eq(stateId));
+            db.run(existingStateEmpCountUpdate);
+            System.out.println("#### Updated State Entity ####");
+        }        
+        context.setCompleted();
+        System.out.println("#### Ends customActionUpdateZeroEmpCountforState ####");
     }
 
     @On(event = CalculateEmpStateWiseContext.CDS_NAME)
