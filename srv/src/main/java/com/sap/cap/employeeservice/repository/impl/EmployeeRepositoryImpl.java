@@ -17,8 +17,6 @@ import com.sap.cds.ql.Update;
 import com.sap.cds.ql.cqn.CqnElementRef;
 import com.sap.cds.ql.cqn.CqnSelect;
 import com.sap.cds.ql.cqn.CqnUpdate;
-import com.sap.cds.services.ErrorStatuses;
-import com.sap.cds.services.ServiceException;
 import com.sap.cds.services.persistence.PersistenceService;
 
 import cds.gen.employeeservice.EmployeeSVC_;
@@ -51,7 +49,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
     @Override
     public void updateExistingStateEmployeeCount(Employee emp) {
         System.out.println("#### Inside updateExistingStateEmployeeCount ####");
-        validateSalary(emp);
         int exisistingStateId = returnAndValidateExistingStateEmpCount(emp);
         if(exisistingStateId > 0) {
             handleExistingEmpStateEmpCount(emp, exisistingStateId);
@@ -90,13 +87,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
         existingStateEmpCount.setEmpCount(existingStateEmpCount.getEmpCount() - 1);
         stateRepository.updateState(existingStateEmpCount);
         System.out.println("##### Updated existing State Data #####");
-    }
-
-    //Validate Salary. If Salary is more than 10,000 then raise Exception with message
-    private void validateSalary(Employee emp) {
-        if(emp.getSalary() > 10000) {
-            throw new ServiceException(ErrorStatuses.BAD_REQUEST, "Salary is higher than decided limit.") ;
-        }
     }
 
     @Override
