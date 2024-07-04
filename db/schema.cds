@@ -48,3 +48,12 @@ entity City
     state_id : Integer;
     state : Association to one State on $self.state_id = state.state_id;
 }
+
+entity EECreationHistory
+{
+    key ID : UUID;
+    createdAt : DateTime;
+    employeeId : String(100);
+    employeeName : String(100);
+    Status : String(100);
+}

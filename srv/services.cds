@@ -21,4 +21,7 @@ service EmployeeService {
     @odata.draft.enabled
     entity CitySVC as
         projection on db.City;
+
+    entity EECreationHistorySVC as
+        projection on db.EECreationHistory;
 }

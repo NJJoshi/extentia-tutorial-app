@@ -1,11 +1,13 @@
 package com.sap.cap.employeeservice.handler;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.sap.cap.employeeservice.EmployeeHistory;
 import com.sap.cap.employeeservice.repository.EmployeeRepository;
 import com.sap.cap.employeeservice.repository.StateRepository;
 import com.sap.cap.employeeservice.validator.EmployeeValidator;
@@ -145,5 +147,17 @@ public class EmployeeEventHandler implements EventHandler {
         context.setCompleted(); // it's neccessary to mark custom action as 'setCompleted()' otherwise it'll throw error & event won't be complete.
         System.out.println("#### Ends customActionRecalculateEmpCountByState ####");
     }
+
+    @On(event = CqnService.EVENT_CREATE, entity=EmployeeSVC_.CDS_NAME)
+    public void setHistory(Employee employee){
+        if (employee != null) {
+            Map<String, String> map = new HashMap<>();
+            map.put("employeeId", employee.getId());
+            map.put("employeeName", employee.getName());
+            map.put("status", "created");
+            EmployeeHistory employeeHistory = new EmployeeHistory();
+            employeeHistory.insertEmployeeHistory(map);
+        }
+    }   
     
 }
