@@ -52,8 +52,8 @@ entity City
 entity EECreationHistory
 {
     key ID : UUID;
-    createdAt : DateTime;
+    // createdAt : DateTime;
     employeeId : String(100);
     employeeName : String(100);
-    Status : String(100);
+    status : String(100);
 }
