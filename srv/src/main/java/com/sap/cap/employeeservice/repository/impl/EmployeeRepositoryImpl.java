@@ -12,14 +12,17 @@ import com.sap.cap.employeeservice.repository.EmployeeRepository;
 import com.sap.cap.employeeservice.repository.StateRepository;
 import com.sap.cds.Result;
 import com.sap.cds.ql.CQL;
+import com.sap.cds.ql.Insert;
 import com.sap.cds.ql.Select;
 import com.sap.cds.ql.Update;
 import com.sap.cds.ql.cqn.CqnElementRef;
+import com.sap.cds.ql.cqn.CqnInsert;
 import com.sap.cds.ql.cqn.CqnSelect;
 import com.sap.cds.ql.cqn.CqnUpdate;
 import com.sap.cds.services.persistence.PersistenceService;
 
 import cds.gen.employeeservice.EmployeeSVC_;
+import cds.gen.sap.capire.employees.EECreationHistory_;
 import cds.gen.sap.capire.employees.Employee;
 import cds.gen.sap.capire.employees.State;
 
@@ -117,5 +120,12 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
     public void updateEmployee(Employee emp) {
          CqnUpdate existingEmpUpdt = Update.entity(EmployeeSVC_.class).data(emp).where(e -> e.ID().eq(emp.getId()));
          db.run(existingEmpUpdt);
+    }
+
+    @Override
+    public void insertEmployeeHistory(Map<String, String> map){
+    System.out.println(map);
+    CqnInsert insert = Insert.into(EECreationHistory_.class).entry(map);
+    db.run(insert);
     }
 }

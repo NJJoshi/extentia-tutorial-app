@@ -11,4 +11,5 @@ public interface EmployeeRepository {
     public void updateExistingStateEmployeeCount(Employee emp);
     public Map<Integer, Integer> getEmployeeCountbyState();
     public void updateEmployee(Employee emp);
+    public void insertEmployeeHistory(Map<String, String> map);
 }

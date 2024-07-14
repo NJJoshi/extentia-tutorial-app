@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sap.cap.employeeservice.EmployeeHistory;
 import com.sap.cap.employeeservice.repository.EmployeeRepository;
 import com.sap.cap.employeeservice.repository.StateRepository;
 import com.sap.cap.employeeservice.validator.EmployeeValidator;
@@ -79,6 +78,7 @@ public class EmployeeEventHandler implements EventHandler {
             state.setEmpCount(value.intValue());
             stateRepository.updateState(state);
         });
+        setHistory(emp);
     }  
     
     //T6.2 - Part 3: Update Total Statewise Employee Count into STATE Entity
@@ -148,15 +148,13 @@ public class EmployeeEventHandler implements EventHandler {
         System.out.println("#### Ends customActionRecalculateEmpCountByState ####");
     }
 
-    @On(event = CqnService.EVENT_CREATE, entity=EmployeeSVC_.CDS_NAME)
-    public void setHistory(Employee employee){
+    private void setHistory(Employee employee){
         if (employee != null) {
             Map<String, String> map = new HashMap<>();
             map.put("employeeId", employee.getId());
             map.put("employeeName", employee.getName());
             map.put("status", "created");
-            EmployeeHistory employeeHistory = new EmployeeHistory();
-            employeeHistory.insertEmployeeHistory(map);
+            empRepository.insertEmployeeHistory(map);
         }
     }   
     
