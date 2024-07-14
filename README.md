@@ -72,3 +72,7 @@ Add a button [Zero State Count] in Employee List screen on each row. On click of
 
 #### 6 - Event Handler 
 When employee is created or updated if salary is > 10000, abort the transaction and show an error message in the UI and abort the save transaction
+
+
+## Add Employee History record into separate Entity called EEEECreationHistory
+Add separate functionality to capture Employee History when we create/update employee record
